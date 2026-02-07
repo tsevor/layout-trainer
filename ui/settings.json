@@ -1,0 +1,73 @@
+{
+	"title": {
+		"type": "text",
+		"text": "Settings",
+		"font": "Arial", "size": 50,
+		"color": [255, 255, 255],
+		"pos": [20, 20]
+	},
+	"layout_label": {
+		"type": "text",
+		"text": "Select Keyboard Layout:",
+		"font": "Arial", "size": 24,
+		"color": [200, 200, 200],
+		"pos": [20, 100]
+	},
+	"current_layout_label": {
+		"type": "text",
+		"text": "Current Layout: qwerty",
+		"font": "Arial", "size": 18,
+		"color": [200, 200, 200],
+		"pos": [20, 130]
+	},
+	"qwerty_button": {
+		"type": "button",
+		"text": "QWERTY",
+		"font": "Arial", "size": 18,
+		"color": [255, 255, 255],
+		"bg_color": [80, 80, 120],
+		"border_color": [120, 120, 160],
+		"border_radius": 10,
+		"pos": [20, 150]
+	},
+	"dvorak_button": {
+		"type": "button",
+		"text": "Dvorak",
+		"font": "Arial", "size": 18,
+		"color": [255, 255, 255],
+		"bg_color": [80, 80, 120],
+		"border_color": [120, 120, 160],
+		"border_radius": 10,
+		"pos": [180, 150]
+	},
+	"colemak_button": {
+		"type": "button",
+		"text": "Colemak",
+		"font": "Arial", "size": 18,
+		"color": [255, 255, 255],
+		"bg_color": [80, 80, 120],
+		"border_color": [120, 120, 160],
+		"border_radius": 10,
+		"pos": [340, 150]
+	},
+	"workman_button": {
+		"type": "button",
+		"text": "Workman",
+		"font": "Arial", "size": 18,
+		"color": [255, 255, 255],
+		"bg_color": [80, 80, 120],
+		"border_color": [120, 120, 160],
+		"border_radius": 10,
+		"pos": [500, 150]
+	},
+	"back_button": {
+		"type": "button",
+		"text": "Back",
+		"font": "Arial", "size": 20,
+		"color": [255, 255, 255],
+		"bg_color": [100, 100, 100],
+		"border_color": [150, 150, 150],
+		"border_radius": 10,
+		"pos": [20, 240]
+	}
+}
