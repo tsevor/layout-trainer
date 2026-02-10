@@ -70,8 +70,11 @@ class keyCodeHandler:
                     # pygame key constant (e.g. unusual symbols); skip them
                     continue
                 if keycode < len(self.keycodes):
+                    # record mapping from keycode -> character but do not
+                    # mark the key as pressed; pressed state is managed
+                    # by handle_keydown/handle_keyup and should be False
+                    # by default.
                     self.keycode_to_char[keycode] = ch
-                    self.keycodes[keycode] = True
 
         self._update_keymap()
 
