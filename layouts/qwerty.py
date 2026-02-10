@@ -13,10 +13,19 @@ for backslash characters.
 name = "QWERTY"
 
 layout = [
-	"`1234567890-=",
 	"qwertyuiop[]\\",
 	"asdfghjkl;'",
 	"zxcvbnm,./"
 ]
-
+layout_shift = [
+	"QWERTYUIOP{}|",
+	"ASDFGHJKL:\"",
+	"ZXCVBNM<>?"
+]
 special_keys = {}  # no changes, default
+
+layout_shift = [
+	"QWERTYUIOP{}|",
+	"ASDFGHJKL:\"",
+	"ZXCVBNM<>?"
+]

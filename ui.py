@@ -114,6 +114,70 @@ class Button(Element):
 		pygame.draw.rect(surface, self.border_color, self.bounds, self.border_width, border_radius=self.border_radius)
 		surface.blit(self.text_surface, self.text_pos)
 
+
+class KeyboardOverlay(Element):
+	def __init__(self, id, data):
+		super().__init__(id, data)
+		import importlib
+		self.data = data
+		self.layout_name = data.get("layout", "qwerty")
+		self.pos = data.get("pos", [20, 200])
+		self.key_width = data.get("key_width", 48)
+		self.key_height = data.get("key_height", 48)
+		self.spacing = data.get("spacing", 6)
+		self.font_size = data.get("font_size", 18)
+		self.font_key = f"kbd_{self.font_size}"
+		if self.font_key not in fonts:
+			fonts[self.font_key] = pygame.font.SysFont(None, self.font_size)
+		self.font = fonts[self.font_key]
+		self.highlight = set(data.get("highlight", []))
+		self._load_layout(importlib)
+
+	def _load_layout(self, importlib_module):
+		try:
+			mod = importlib_module.import_module(f"layouts.{self.layout_name}")
+			rows = getattr(mod, "layout", [])
+		except Exception:
+			rows = []
+		self.rows = rows
+		self._render_keys()
+
+	def _render_keys(self):
+		self.keys = []
+		x0, y0 = self.pos
+		y = y0
+		rownum = 0
+		for row in self.rows:
+			x = x0 + ( rownum* self.key_width /2)
+			rownum += 1
+			for ch in row:
+				rect = pygame.Rect(x, y, self.key_width, self.key_height)
+				label = ch
+				surf = self.font.render(label, True, (255, 255, 255))
+				text_pos = surf.get_rect(center=rect.center)
+				self.keys.append((ch, rect, surf, text_pos))
+				x += self.key_width + self.spacing
+			y += self.key_height + self.spacing
+		#render spacebar
+		rect = pygame.Rect(x0 + self.key_width, y, self.key_width * 5, self.key_height)
+		surf = self.font.render(" ", True, (255, 255, 255))
+		text_pos = surf.get_rect(center=rect.center)
+		self.keys.append((" ", rect, surf, text_pos))
+
+	def set_layout(self, layout_name):
+		import importlib
+		self.layout_name = layout_name
+		self._load_layout(importlib)
+
+	def draw(self, surface):
+		for ch, rect, surf, text_pos in self.keys:
+			color = (80, 80, 120)
+			if ch.lower() in self.highlight:
+				color = (200, 100, 60)
+			pygame.draw.rect(surface, color, rect, border_radius=6)
+			pygame.draw.rect(surface, (120, 120, 160), rect, 2, border_radius=6)
+			surface.blit(surf, text_pos)
+
 class Scene:
 	def __init__(self, layout_path):
 		with open(layout_path) as f:
@@ -124,6 +188,8 @@ class Scene:
 				self.elements.append(Text(el_id, el_data))
 			elif el_data["type"] == "button":
 				self.elements.append(Button(el_id, el_data))
+			elif el_data["type"] == "keyboard_overlay":
+				self.elements.append(KeyboardOverlay(el_id, el_data))
 	
 	def draw(self, surface):
 		for el in self.elements:

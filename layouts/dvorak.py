@@ -7,7 +7,6 @@ the same top-level variables: `name`, `layout`, and `special_keys`.
 name = "Dvorak"
 
 layout = [
-	"`1234567890[]",
 	"',.pyfgcrl/=",
 	"aoeuidhtns-",
 	";qjkxbmwvz"
@@ -16,3 +15,9 @@ layout = [
 special_keys = {
 	"caps": "backspace"
 }
+
+layout_shift = [
+	"\"<>PYFGCRL?+",
+	"AOEUIDHTNS_",
+	":QJKXBMWVZ"
+]

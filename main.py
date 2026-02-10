@@ -17,11 +17,12 @@ pygame.init()
 pygame.font.init()
 
 screen = pygame.display.set_mode((800, 600))
+pygame.display.set_caption("Layout Trainer")
 clock = pygame.time.Clock()
 
 scenes = {
 	"main-menu": ui.Scene("ui/main-menu.json"),
-	# "training": ui.Scene("ui/training.json"),
+	"training": ui.Scene("ui/training.json"),
 	"settings": ui.Scene("ui/settings.json")
 }
 
@@ -31,6 +32,13 @@ current_layout = "qwerty"
 
 def on_start_training(btn):
 	global scene
+	# ensure keyboard overlay reflects current layout
+	kbd = scenes["training"].get_element("keyboard")
+	if kbd:
+		try:
+			kbd.set_layout(current_layout)
+		except Exception:
+			pass
 	scene = "training"
 
 def on_settings(btn):
@@ -72,6 +80,10 @@ scenes["settings"].on_click("back_button", back_to_menu)
 scenes["main-menu"].on_click("settings_button", on_settings)
 scenes["main-menu"].on_click("start_button", on_start_training)
 scenes["main-menu"].on_click("quit_button", on_quit)
+
+# training scene callbacks
+scenes["training"].on_click("back_button", back_to_menu)
+
 
 running = True
 while running:

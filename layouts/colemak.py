@@ -7,7 +7,6 @@ See `layouts/qwerty.py` for format details. Provide `name`,
 name = "Colemak"
 
 layout = [
-	"`1234567890-=",
 	"qwfpgjluy;[]\\",
 	"arstdhneio'",
 	"zxcvbkm,./"
@@ -16,3 +15,9 @@ layout = [
 special_keys = {
 	"caps": "backspace"
 }
+
+layout_shift = [
+	"QWFPGJLUY:{}|",
+	"ARSTDHNEIO\"",
+	"ZXCVBKM<>?"
+]
