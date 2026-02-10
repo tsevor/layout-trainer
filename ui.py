@@ -1,3 +1,29 @@
+"""UI helpers: lightweight JSON-driven scene and element system.
+
+This module provides a minimal UI layer used by `main.py`. The
+layout format is JSON (see `ui/main-menu.json` and
+`ui/settings.json`) and maps element ids to element definitions.
+
+Provided classes:
+- `Scene(layout_path)`: loads a JSON layout and manages drawing and
+	click dispatch for its elements.
+- `Element`, `Text`, `Button`: basic drawable/clickable elements.
+
+The module keeps a small font cache to avoid re-creating Pygame
+fonts repeatedly.
+
+JSON element schema (example fields):
+{
+	"type": "button" | "text",
+	"text": "Label",
+	"pos": [x, y],
+	"size": 14,
+	"font": "Arial",
+	"color": "#RRGGBB",
+	"bg_color": "#RRGGBB"
+}
+"""
+
 import json
 import pygame
 

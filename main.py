@@ -1,4 +1,14 @@
 #!/usr/bin/env python3
+"""layout-trainer — simple typing layout trainer GUI launcher.
+
+This script is the program entrypoint. It initializes Pygame,
+registers simple scene callbacks from `ui.Scene` definitions stored
+as JSON in the `ui/` folder, and runs the main event loop.
+
+Run: python3 main.py
+
+The program depends on `pygame` and the local `ui` module.
+"""
 
 import pygame
 import ui
