@@ -151,15 +151,25 @@ class KeyboardOverlay(Element):
 			x = x0 + ( rownum* self.key_width /2)
 			rownum += 1
 			for ch in row:
+				color = (80, 80, 120)
+				#detect if the key is pressed and change color if so
+				if ch.lower() in self.highlight:
+					color = (200, 100, 60)
+					self.highlight.remove(ch.lower())
+					self.highlight.remove(ch.upper())
+				else:
+					color = (80, 80, 120)
+					self.highlight.discard(ch.lower())
+					self.highlight.discard(ch.upper())
 				rect = pygame.Rect(x, y, self.key_width, self.key_height)
 				label = ch
-				surf = self.font.render(label, True, (255, 255, 255))
+				surf = self.font.render(label, True, color)
 				text_pos = surf.get_rect(center=rect.center)
 				self.keys.append((ch, rect, surf, text_pos))
 				x += self.key_width + self.spacing
 			y += self.key_height + self.spacing
 		#render spacebar
-		rect = pygame.Rect(x0 + self.key_width, y, self.key_width * 5, self.key_height)
+		rect = pygame.Rect(x0 + self.key_width*4, y, self.key_width * 5, self.key_height)
 		surf = self.font.render(" ", True, (255, 255, 255))
 		text_pos = surf.get_rect(center=rect.center)
 		self.keys.append((" ", rect, surf, text_pos))
