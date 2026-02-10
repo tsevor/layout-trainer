@@ -42,6 +42,8 @@ class keyCodeHandler:
         # upper bound for typical pygame key constants.
         self.keycodes = [False] * 512
         self.keycode_to_char = {}
+        # parallel mapping for shifted characters (if layout provides `layout_shift`)
+        self.keycode_to_shiftchar = {}
         self._load_layout()
 
     def _load_layout(self, layout_name=None):
@@ -75,6 +77,28 @@ class keyCodeHandler:
                     # by handle_keydown/handle_keyup and should be False
                     # by default.
                     self.keycode_to_char[keycode] = ch
+                    # determine shifted character for this position, if available
+                    try:
+                        shift_rows = getattr(importlib.import_module(f"layouts.{layout_name}"), "layout_shift", None)
+                    except Exception:
+                        shift_rows = None
+                    # default shift char is uppercase of base if not present
+                    shift_char = ch.upper()
+                    if shift_rows:
+                        # attempt to find this char's position in rows to lookup shifted char
+                        found = False
+                        for r_idx, r in enumerate(rows):
+                            if ch in r:
+                                c_idx = r.index(ch)
+                                try:
+                                    shift_char = shift_rows[r_idx][c_idx]
+                                except Exception:
+                                    shift_char = ch.upper()
+                                found = True
+                                break
+                        if not found:
+                            shift_char = ch.upper()
+                    self.keycode_to_shiftchar[keycode] = shift_char
 
         self._update_keymap()
 
@@ -176,6 +200,37 @@ class keyCodeHandler:
         """
         if 0 <= event.key < len(self.keycodes):
             self.keycodes[event.key] = False
+
+    def is_shift_active(self):
+        """Return True if either Shift key is currently pressed."""
+        try:
+            l = pygame.K_LSHIFT
+            r = pygame.K_RSHIFT
+            return ((0 <= l < len(self.keycodes) and self.keycodes[l]) or
+                    (0 <= r < len(self.keycodes) and self.keycodes[r]))
+        except Exception:
+            return False
+
+    def get_char_for_keycode(self, keycode):
+        """Return the character for `keycode`, considering Shift state.
+
+        If Shift is active and a shifted mapping exists, the shifted
+        character is returned; otherwise the base mapping is returned.
+        Returns None if the keycode is unmapped.
+        """
+        if keycode is None:
+            return None
+        if self.is_shift_active():
+            return self.keycode_to_shiftchar.get(keycode) or self.keycode_to_char.get(keycode)
+        return self.keycode_to_char.get(keycode)
+
+    def translate_event(self, event):
+        """Given a Pygame KEYDOWN event, return the corresponding character.
+
+        This is the primary helper to convert raw key events into layout
+        characters respecting Shift. Returns None if unmapped.
+        """
+        return self.get_char_for_keycode(getattr(event, 'key', None))
 
     def _update_keymap(self):
         """Hook for additional state updates after loading a layout.
