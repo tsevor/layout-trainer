@@ -17,7 +17,9 @@ pygame.init()
 pygame.font.init()
 
 screen = pygame.display.set_mode((800, 600))
-pygame.display.set_icon("icon")
+#make surface for icon.ico
+icon = pygame.image.load("icon.ico")
+pygame.display.set_icon(icon)
 pygame.display.set_caption("Layout Trainer")
 clock = pygame.time.Clock()
 
