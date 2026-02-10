@@ -90,6 +90,77 @@ class keyCodeHandler:
         self.keycodes = [False] * len(self.keycodes)
         self._load_layout(layout_name)
 
+    def _get_flat_layout(self, layout_name):
+        """Return a flat list of characters for the given layout module.
+
+        The returned list preserves row-major ordering used by the
+        layout modules. If the module can't be imported, an empty list
+        is returned.
+        """
+        import importlib
+        try:
+            mod = importlib.import_module(f"layouts.{layout_name}")
+            rows = getattr(mod, "layout", [])
+        except Exception:
+            return []
+        flat = []
+        for row in rows:
+            for ch in row:
+                flat.append(ch)
+        # include a space key at the end if layouts don't include it
+        flat.append(' ')
+        return flat
+
+    def translate_layout(self, new_layout, from_layout=None):
+        """Translate key mappings from one layout to another.
+
+        This attempts to preserve physical key positions: a character
+        in `from_layout` at position i will be mapped to the character
+        at position i in `new_layout`. The function updates
+        `keycode_to_char` so that existing pygame keycodes continue to
+        refer to the corresponding character in the new layout.
+
+        Args:
+            new_layout: target layout module name.
+            from_layout: optional source layout module name. If omitted
+                `self.layout_name` is used.
+        """
+        if from_layout is None:
+            from_layout = self.layout_name
+
+        from_flat = self._get_flat_layout(from_layout)
+        to_flat = self._get_flat_layout(new_layout)
+        if not from_flat or not to_flat:
+            # fallback to simple set_layout if layouts unavailable
+            self.set_layout(new_layout)
+            return
+
+        # build char->index map for the source layout
+        index_map = {}
+        for i, ch in enumerate(from_flat):
+            if ch not in index_map:
+                index_map[ch] = i
+
+        new_keycode_to_char = {}
+
+        # For each known keycode in the current mapping, translate
+        # the character based on its position in the source layout.
+        for keycode, ch in list(self.keycode_to_char.items()):
+            idx = index_map.get(ch)
+            if idx is None or idx >= len(to_flat):
+                # if we can't translate, keep the original char
+                new_char = ch
+            else:
+                new_char = to_flat[idx]
+            new_keycode_to_char[keycode] = new_char
+
+        # replace mapping and update layout name
+        self.keycode_to_char = new_keycode_to_char
+        self.layout_name = new_layout
+
+        # update any other derived state
+        self._update_keymap()
+
     def handle_keydown(self, event):
         """Mark a key as pressed.
 

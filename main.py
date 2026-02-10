@@ -73,9 +73,16 @@ def back_to_menu(btn):
 def set_layout(layout_name):
 	def callback(btn):
 		global current_layout
+		old = current_layout
 		current_layout = layout_name
 		scenes["settings"].get_element("current_layout_label").change_text(f"Current Layout: {layout_name}")
-		key_handler.set_layout(layout_name)  # update keycode->char mapping for the new layout
+		# translate existing key mappings so physical keys map to the
+		# equivalent character in the new layout (preserve positions).
+		try:
+			key_handler.translate_layout(layout_name, from_layout=old)
+		except Exception:
+			# fallback to simple set_layout if translation fails
+			key_handler.set_layout(layout_name)
 		# if the keyboard overlay exists, update it too
 		kbd = scenes["training"].get_element("keyboard")
 		if kbd:
