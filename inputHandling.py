@@ -44,7 +44,7 @@ class keyCodeHandler:
         self.keycode_to_char = {}
         self._load_layout()
 
-    def _load_layout(self):
+    def _load_layout(self, layout_name=None):
         """Load the layout module and build the keycode->char map.
 
         The layout modules expose `layout` as a list of strings (rows).
@@ -53,8 +53,10 @@ class keyCodeHandler:
         particular character, it is skipped.
         """
         import importlib
+        if layout_name is None:
+            layout_name = self.layout_name
         try:
-            mod = importlib.import_module(f"layouts.{self.layout_name}")
+            mod = importlib.import_module(f"layouts.{layout_name}")
             rows = getattr(mod, "layout", [])
         except Exception:
             rows = []
@@ -72,6 +74,18 @@ class keyCodeHandler:
                     self.keycodes[keycode] = True
 
         self._update_keymap()
+
+    def set_layout(self, layout_name):
+        """Public setter to change the active layout and rebuild mappings.
+
+        Args:
+            layout_name: layout module name (e.g., 'qwerty').
+        """
+        self.layout_name = layout_name
+        # clear previous mappings
+        self.keycode_to_char.clear()
+        self.keycodes = [False] * len(self.keycodes)
+        self._load_layout(layout_name)
 
     def handle_keydown(self, event):
         """Mark a key as pressed.

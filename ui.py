@@ -131,6 +131,8 @@ class KeyboardOverlay(Element):
 			fonts[self.font_key] = pygame.font.SysFont(None, self.font_size)
 		self.font = fonts[self.font_key]
 		self.highlight = set(data.get("highlight", []))
+		self.key_handler = None
+		self.char_to_keycode = {}
 		self._load_layout(importlib)
 
 	def _load_layout(self, importlib_module):
@@ -148,31 +150,38 @@ class KeyboardOverlay(Element):
 		y = y0
 		rownum = 0
 		for row in self.rows:
-			x = x0 + ( rownum* self.key_width /2)
+			x = x0 + (rownum * self.key_width / 2)
 			rownum += 1
 			for ch in row:
-				color = (80, 80, 120)
-				#detect if the key is pressed and change color if so
-				if ch.lower() in self.highlight:
-					color = (200, 100, 60)
-					self.highlight.remove(ch.lower())
-					self.highlight.remove(ch.upper())
-				else:
-					color = (80, 80, 120)
-					self.highlight.discard(ch.lower())
-					self.highlight.discard(ch.upper())
 				rect = pygame.Rect(x, y, self.key_width, self.key_height)
 				label = ch
-				surf = self.font.render(label, True, color)
+				surf = self.font.render(label, True, (255, 255, 255))
 				text_pos = surf.get_rect(center=rect.center)
 				self.keys.append((ch, rect, surf, text_pos))
 				x += self.key_width + self.spacing
 			y += self.key_height + self.spacing
-		#render spacebar
-		rect = pygame.Rect(x0 + self.key_width*4, y, self.key_width * 5, self.key_height)
+
+		# render spacebar
+		rect = pygame.Rect(x0 + self.key_width * 4, y, self.key_width * 5, self.key_height)
 		surf = self.font.render(" ", True, (255, 255, 255))
 		text_pos = surf.get_rect(center=rect.center)
 		self.keys.append((" ", rect, surf, text_pos))
+
+	def set_key_handler(self, handler):
+		"""Attach an input handler instance for live pressed-key highlighting.
+
+		The handler is expected to be an instance of `inputHandling.keyCodeHandler`.
+		We build a reverse map from characters to pygame keycodes to efficiently
+		check pressed state in `draw()`.
+		"""
+		self.key_handler = handler
+		self.char_to_keycode = {}
+		if handler is None:
+			return
+		for k, v in handler.keycode_to_char.items():
+			# store both the exact and lowercase character for lookups
+			self.char_to_keycode[v] = k
+			self.char_to_keycode.setdefault(v.lower(), k)
 
 	def set_layout(self, layout_name):
 		import importlib
@@ -181,9 +190,18 @@ class KeyboardOverlay(Element):
 
 	def draw(self, surface):
 		for ch, rect, surf, text_pos in self.keys:
-			color = (80, 80, 120)
-			if ch.lower() in self.highlight:
-				color = (200, 100, 60)
+			pressed = False
+			if self.key_handler:
+				keycode = self.char_to_keycode.get(ch) or self.char_to_keycode.get(ch.lower())
+				if keycode is None:
+					try:
+						keycode = pygame.key.key_code(ch)
+					except Exception:
+						keycode = None
+				if keycode is not None and 0 <= keycode < len(self.key_handler.keycodes):
+					pressed = bool(self.key_handler.keycodes[keycode])
+
+			color = (200, 100, 60) if (pressed or ch.lower() in self.highlight) else (80, 80, 120)
 			pygame.draw.rect(surface, color, rect, border_radius=6)
 			pygame.draw.rect(surface, (120, 120, 160), rect, 2, border_radius=6)
 			surface.blit(surf, text_pos)
