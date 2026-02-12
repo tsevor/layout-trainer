@@ -129,7 +129,7 @@ class KeyboardOverlay(Element):
 		super().__init__(id, data)
 		import importlib
 		self.data = data
-		self.rowsShown = [1]  # default to showing all rows
+		self.rowsShown = data.get("rows_shown", [0, 1, 2])  # default to showing all rows
 		self.hideLabels = False
 		self.layout_name = data.get("layout", "qwerty")
 		self.pos = data.get("pos", [20, 200])

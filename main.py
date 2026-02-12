@@ -27,7 +27,9 @@ clock = pygame.time.Clock()
 scenes = {
 	"main-menu": ui.Scene("ui/main-menu.json"),
 	"training": ui.Scene("ui/training.json"),
-	"settings": ui.Scene("ui/settings.json")
+	"settings": ui.Scene("ui/settings.json"),
+	"levels": ui.Scene("ui/levels.json"),
+	"level_1": ui.Scene("ui/levels/level_1.json"),
 }
 
 key_handler = inputHandling.keyCodeHandler({"layout": "qwerty"})
@@ -36,16 +38,29 @@ current_layout = "qwerty"
 
 def on_start_training(btn):
 	global scene
-	# ensure keyboard overlay reflects current layout
-	kbd = scenes["training"].get_element("keyboard")
-	if kbd:
-		try:
-			kbd.set_layout(current_layout)
-			# attach the global key handler so the overlay can highlight pressed keys
-			kbd.set_key_handler(key_handler)
-		except Exception:
-			pass
-	scene = "training"
+	scene = "levels"
+
+# on_load level take a level name string and then load level callback, takes level name as argument and sets scene to that level
+#try to load the keyboard element from the level scene and set its layout and key handler to match the current settings
+def on_load_level(level_name):
+	def callback(btn):
+		global scene
+		scene = level_name
+		level_scene = scenes.get(level_name)
+		if level_scene:
+			kbd = level_scene.get_element("keyboard")
+			if kbd:
+				try:
+					kbd.set_layout(current_layout)
+					kbd.set_key_handler(key_handler)
+				except Exception:
+					pass
+	return callback
+
+	
+
+
+
 
 def on_settings(btn):
 	global scene
@@ -103,8 +118,14 @@ scenes["main-menu"].on_click("settings_button", on_settings)
 scenes["main-menu"].on_click("start_button", on_start_training)
 scenes["main-menu"].on_click("quit_button", on_quit)
 
+scenes["levels"].on_click("level_1_btn", on_load_level("level_1"))
+scenes["levels"].on_click("exit_button", back_to_menu)
+
+
 # training scene callbacks
 scenes["training"].on_click("back_button", back_to_menu)
+
+scenes["level_1"].on_click("back_button", back_to_menu)
 
 
 running = True
