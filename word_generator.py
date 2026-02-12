@@ -17,7 +17,7 @@ def commonality(s): # Checks how common the letters in a word is for the list
     return score/len(s)
 
 
-class wordlist: # I don't know if we need a class here, but we do now
+class Wordlist: # I don't know if we need a class here, but we do now
     global chars
     def __init__(self,layout="qwerty",rows=[1],min_length=3): # Rows is a list of the rows you want to include top: 0, middle: 1, bottom 2
         self.layout = layout

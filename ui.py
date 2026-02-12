@@ -258,7 +258,7 @@ class KeyboardOverlay(Element):
 
 #copy of text goal is to have a cursor and a incorrect and correct font color per character might need multiple surfaces to acheive that result
 #needs to be able to get the keys and be able to check. also needs to be able to switch modes between burst type and 
-class Text_box:
+class Text_box(Element):
 	def __init__(self, id, data):
 		super().__init__(id, data)
 		import importlib
@@ -267,7 +267,7 @@ class Text_box:
 		self.font_name = data.get("font", "Arial")
 		self.font_size = data.get("size", 12)
 		self.layout_name = data.get("layout_name", "qwerty")
-		self.words = word_generator.wordlist(self.layout_name,[1])
+		
 		self.font_key = f"{self.font_name}_{self.font_size}"
 		if self.font_key not in fonts:
 			fonts[self.font_key] = pygame.font.SysFont(self.font_name, self.font_size)
@@ -278,6 +278,7 @@ class Text_box:
 	def change_text(self, new_text):
 		self.text = new_text
 		self.render()
+	
 	#load layout
 	def _load_layout(self, importlib_module):
 		try:
@@ -316,6 +317,9 @@ class Scene:
 				self.elements.append(Button(el_id, el_data))
 			elif el_data["type"] == "keyboard_overlay":
 				self.elements.append(KeyboardOverlay(el_id, el_data))
+			elif el_data["type"] == "text_box":
+				print(el_id)
+				self.elements.append(Text_box(el_id, el_data))
 	
 	def draw(self, surface):
 		for el in self.elements:

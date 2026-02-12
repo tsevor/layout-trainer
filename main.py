@@ -56,7 +56,13 @@ def on_load_level(level_name):
 					kbd.set_key_handler(key_handler)
 				except Exception:
 					pass
-				
+
+		words_object = word_generator.Wordlist(current_layout,[1])
+		sentence = ""
+		for word in words_object.random(10):
+			sentence += word + " "
+			
+		level_scene.get_element("input_text").change_text(sentence)
 				
 
 	return callback
