@@ -8,8 +8,8 @@ name = "Workman"
 
 layout = [
 	"qdrwbjfup;[]\\",
-	"ashtgneio'",
-	"zxcvkm,./"
+	"ashtgyneoi'",
+	"zxmcvkl,./"
 ]
 
 special_keys = {
@@ -18,6 +18,6 @@ special_keys = {
 
 layout_shift = [
 	"QDRWBJFUP:{}|",
-	"ASHTGNEIO\"",
-	"ZXCVKM<>?"
+	"ASHTGYNEOI\"",
+	"ZXMCVKL<>?"
 ]

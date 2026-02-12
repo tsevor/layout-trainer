@@ -6,8 +6,9 @@ the same top-level variables: `name`, `layout`, and `special_keys`.
 
 name = "Dvorak"
 
+
 layout = [
-	"',.pyfgcrl/=",
+	"',.pyfgcrl/=\\",
 	"aoeuidhtns-",
 	";qjkxbmwvz"
 ]
@@ -17,7 +18,7 @@ special_keys = {
 }
 
 layout_shift = [
-	"\"<>PYFGCRL?+",
+	"\"<>PYFGCRL?+|",
 	"AOEUIDHTNS_",
 	":QJKXBMWVZ"
 ]
