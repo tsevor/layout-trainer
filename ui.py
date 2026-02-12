@@ -256,6 +256,54 @@ class KeyboardOverlay(Element):
 			text_pos = surf.get_rect(center=rect.center)
 			surface.blit(surf, text_pos)
 
+#copy of text goal is to have a cursor and a incorrect and correct font color per character might need multiple surfaces to acheive that result
+#needs to be able to get the keys and be able to check. also needs to be able to switch modes between burst type and 
+class Text_box:
+	def __init__(self, id, data):
+		super().__init__(id, data)
+		import importlib
+		import word_generator
+		self.text = data["text"]
+		self.font_name = data.get("font", "Arial")
+		self.font_size = data.get("size", 12)
+		self.layout_name = data.get("layout_name", "qwerty")
+		self.words = word_generator.wordlist(self.layout_name,[1])
+		self.font_key = f"{self.font_name}_{self.font_size}"
+		if self.font_key not in fonts:
+			fonts[self.font_key] = pygame.font.SysFont(self.font_name, self.font_size)
+		self.font = fonts[self.font_key]
+		self.color = parse_color(data.get("color", (255, 255, 255)))
+		self.pos = data.get("pos", [0, 0])
+	
+	def change_text(self, new_text):
+		self.text = new_text
+		self.render()
+	#load layout
+	def _load_layout(self, importlib_module):
+		try:
+			mod = importlib_module.import_module(f"layouts.{self.layout_name}")
+			
+			self.shift_rows = getattr(mod, "layout_shift", None)
+		except Exception:
+			print(" loading layout failed")
+			
+		
+		
+	
+	def set_layout(self, layout_name):
+		import importlib
+		self.layout_name = layout_name
+		self._load_layout(importlib)
+
+	def draw(self, surface):
+		surface.blit(self.rendered_text, self.bounds)
+		self.change_text()
+		
+		
+		
+	
+
+
 class Scene:
 	def __init__(self, layout_path):
 		with open(layout_path) as f:
@@ -291,3 +339,4 @@ class Scene:
 			if el.id == element_id:
 				return el
 		return None
+	

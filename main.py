@@ -13,6 +13,7 @@ The program depends on `pygame` and the local `ui` module.
 import pygame
 import ui
 import inputHandling
+import word_generator
 
 pygame.init()
 pygame.font.init()
@@ -55,6 +56,9 @@ def on_load_level(level_name):
 					kbd.set_key_handler(key_handler)
 				except Exception:
 					pass
+				
+				
+
 	return callback
 
 	
