@@ -4,7 +4,7 @@
 		"text": "Keyboard Layout Trainer",
 		"font": "Arial", "size": 50,
 		"color": [255, 255, 255],
-		"pos": [20, 20]
+		"pos": [200, 20]
 	},
 	"start_button": {
 		"type": "button",
@@ -14,7 +14,8 @@
 		"bg_color": [70, 130, 180],
 		"border_color": [100, 160, 200],
 		"border_radius": 12,
-		"pos": [20, 120]
+		"pos": [400, 120],
+		"centered": true
 	},
 	"settings_button": {
 		"type": "button",
@@ -24,7 +25,8 @@
 		"bg_color": [180, 120, 70],
 		"border_color": [200, 160, 100],
 		"border_radius": 12,
-		"pos": [20, 180]
+		"pos": [400, 180],
+		"centered": true
 	},
 	"quit_button": {
 		"type": "button",
@@ -34,6 +36,7 @@
 		"bg_color": [180, 70, 70],
 		"border_color": [200, 100, 100],
 		"border_radius": 12,
-		"pos": [20, 240]
+		"pos": [400, 240],
+		"centered": true
 	}
 }

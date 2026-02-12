@@ -92,8 +92,11 @@ class Button(Element):
 		self.border_color = parse_color(data.get("border_color", (150, 150, 150)))
 		self.border_width = data.get("border_width", 1)
 		self.border_radius = data.get("border_radius", 8)
+		self.centered = data.get("centered", False)
 		self.pos = data.get("pos", [0, 0])
+		
 		self.padding = data.get("padding", 10)
+		
 		
 		self.render()
 	
@@ -105,9 +108,15 @@ class Button(Element):
 		text_surface = self.font.render(self.text, True, self.color)
 		w = text_surface.get_width() + self.padding * 2
 		h = text_surface.get_height() + self.padding * 2
-		self.bounds = pygame.Rect(self.pos[0], self.pos[1], w, h)
+		if self.centered:
+			self.bounds = pygame.Rect(self.pos[0] - w/2, self.pos[1] - h/2, w, h)
+		else:
+			self.bounds = pygame.Rect(self.pos[0], self.pos[1], w, h)
 		self.text_surface = text_surface
-		self.text_pos = (self.pos[0] + self.padding, self.pos[1] + self.padding)
+		if self.centered:
+			self.text_pos = (self.pos[0] - w/2 + self.padding, self.pos[1] - h/2 + self.padding)
+		else:
+			self.text_pos = (self.pos[0] + self.padding, self.pos[1] + self.padding)
 	
 	def draw(self, surface):
 		pygame.draw.rect(surface, self.bg_color, self.bounds, border_radius=self.border_radius)
@@ -120,6 +129,8 @@ class KeyboardOverlay(Element):
 		super().__init__(id, data)
 		import importlib
 		self.data = data
+		self.rowsShown = [1]  # default to showing all rows
+		self.hideLabels = False
 		self.layout_name = data.get("layout", "qwerty")
 		self.pos = data.get("pos", [20, 200])
 		self.key_width = data.get("key_width", 48)
@@ -214,7 +225,11 @@ class KeyboardOverlay(Element):
 
 		for base_ch, rect, row_idx, col_idx in self.keys:
 			# choose label: shifted if shift held and mapping available
-			label = base_ch
+			if row_idx in self.rowsShown and not self.hideLabels:
+				label = base_ch
+			else :
+				label = ""
+			
 			if shift_held and hasattr(self, 'shift_rows') and self.shift_rows:
 				if 0 <= row_idx < len(self.shift_rows):
 					row = self.shift_rows[row_idx]
