@@ -575,7 +575,6 @@ asp
 aspect
 aspects
 aspnet
-ass
 assault
 assembled
 assembly
@@ -2284,7 +2283,6 @@ damage
 damaged
 damages
 dame
-damn
 dan
 dana
 dance
@@ -3688,9 +3686,6 @@ fs
 ft
 ftp
 fu
-fuck
-fucked
-fucking
 fuel
 fuji
 fujitsu
@@ -8097,7 +8092,6 @@ shipping
 ships
 shirt
 shirts
-shit
 shock
 shoe
 shoes
