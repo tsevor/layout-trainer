@@ -318,7 +318,6 @@ class Scene:
 			elif el_data["type"] == "keyboard_overlay":
 				self.elements.append(KeyboardOverlay(el_id, el_data))
 			elif el_data["type"] == "text_box":
-				print(el_id)
 				self.elements.append(Text_box(el_id, el_data))
 	
 	def draw(self, surface):
