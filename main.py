@@ -43,9 +43,11 @@ def on_start_training(btn):
 
 # on_load level take a level name string and then load level callback, takes level name as argument and sets scene to that level
 #try to load the keyboard element from the level scene and set its layout and key handler to match the current settings
+
+input_text = None
 def on_load_level(level_name):
 	def callback(btn):
-		global scene
+		global scene, input_text
 		scene = level_name
 		level_scene = scenes.get(level_name)
 		input_text = level_scene.get_element("input_text")
@@ -152,6 +154,8 @@ while running:
 			if event.button == 1:
 				scenes[scene].click(event.pos)
 		elif event.type == pygame.KEYDOWN:
+			if input_text:
+				input_text.update_text(key_handler.translate_event(event))
 			# forward key events to the input handler for pressed-state tracking
 			try:
 				key_handler.handle_keydown(event)

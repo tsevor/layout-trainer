@@ -16,7 +16,7 @@
 		"pos": [20, 80]
 	},
 	"input_text": {
-		"type": "text",
+		"type": "text_box",
 		"text": "text goes here",
 		"rows_shown": [1],
 		"font": "Arial",

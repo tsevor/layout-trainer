@@ -279,6 +279,10 @@ class Text_box(Element):
 		self.text = new_text
 		self.render()
 	
+	def update_text(self, key):
+		if key == self.text[0]: 
+			self.change_text(self.text[1:])
+
 	#load layout
 	def _load_layout(self, importlib_module):
 		try:
@@ -287,23 +291,18 @@ class Text_box(Element):
 			self.shift_rows = getattr(mod, "layout_shift", None)
 		except Exception:
 			print(" loading layout failed")
-			
-		
-		
-	
+				
 	def set_layout(self, layout_name):
 		import importlib
 		self.layout_name = layout_name
 		self._load_layout(importlib)
 
+	def render(self):
+		self.rendered_text = self.font.render(self.text, True, self.color)
+		self.bounds = self.rendered_text.get_rect(topleft=self.pos)
+
 	def draw(self, surface):
 		surface.blit(self.rendered_text, self.bounds)
-		self.change_text()
-		
-		
-		
-	
-
 
 class Scene:
 	def __init__(self, layout_path):

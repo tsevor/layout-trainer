@@ -218,6 +218,8 @@ class keyCodeHandler:
         character is returned; otherwise the base mapping is returned.
         Returns None if the keycode is unmapped.
         """
+        if keycode == 32:
+            return ' '
         if keycode is None:
             return None
         if self.is_shift_active():
