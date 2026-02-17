@@ -21,7 +21,7 @@
 		"type": "button",
 		"text": "level 2",
 		"font": "Arial", "size": 20,
-		"color": [89, 91, 102],
+		"color": [255, 255, 255],
 		"bg_color": [180, 120, 70],
 		"border_color": [52, 53, 61],
 		"border_radius": 12,
