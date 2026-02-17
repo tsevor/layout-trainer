@@ -63,18 +63,12 @@ def on_load_level(level_name):
 
 				except Exception:
 					pass
-		
-		if level_name == "level_1":
-			input_text.start_level(current_layout,on_start_training)
-		if level_name == "level_2":
-			input_text.start_level(current_layout,on_start_training)
+					
+				#kbd
+				input_text.start_level(current_layout,on_start_training)
+				
 
 	return callback
-
-	
-
-
-
 
 def on_settings(btn=None):
 	global scene

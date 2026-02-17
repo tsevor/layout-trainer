@@ -60,7 +60,7 @@ class Wordlist: # I don't know if we need a class here, but we do now
                 self.all_words.append(word)
 
         if not "http" in file:
-            words.close()
+            words_file.close()
         # self.all_words.sort(key=commonality) sorts words based on how common the letters in the word are, but it is not needed for our purposes and it is slow, so I commented it out
 
     def random(self,amount=10): # Generates a list of random words, amount being the amount

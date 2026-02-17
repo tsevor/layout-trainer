@@ -3232,8 +3232,6 @@ eye
 eyed
 eyes
 ez
-f
-fa
 fabric
 fabrics
 fabulous
@@ -9862,4 +9860,3 @@ zones
 zoning
 zoo
 zoom
-zoophilia
