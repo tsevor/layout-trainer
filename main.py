@@ -13,7 +13,6 @@ The program depends on `pygame` and the local `ui` module.
 import pygame
 import ui
 import inputHandling
-import word_generator
 
 pygame.init()
 pygame.font.init()
@@ -34,24 +33,32 @@ scenes = {
 	"level_2": ui.Scene("ui/levels/level_2.json"),
 }
 
+level_difficulty = [
+	[1],
+	[0,1],
+	[0,2],
+	[0,1,2]
+]
+
 key_handler = inputHandling.keyCodeHandler({"layout": "qwerty"})
 scene = "main-menu"
 current_layout = "qwerty"
 
-def on_start_training(btn):
+def on_start_training(btn=None):
 	global scene
 	scene = "levels"
 
 # on_load level take a level name string and then load level callback, takes level name as argument and sets scene to that level
 #try to load the keyboard element from the level scene and set its layout and key handler to match the current settings
 
-input_text = None
+input_text = scenes['level_1'].get_element("input_text")
 def on_load_level(level_name):
 	def callback(btn):
 		global scene, input_text
+
+		input_text = scenes[level_name].get_element("input_text")
 		scene = level_name
 		level_scene = scenes.get(level_name)
-		input_text = level_scene.get_element("input_text")
 
 		
 		if level_scene:
@@ -64,14 +71,8 @@ def on_load_level(level_name):
 				except Exception:
 					pass
 		
-		words_object = word_generator.Wordlist(current_layout,[1])
-		sentence = ""
-		for word in words_object.random(10):
-			sentence += word + " "
-			
-		input_text.change_text(sentence)
-
-				
+		if level_name == "level_1":
+			input_text.start_level(1,current_layout,level_difficulty[0],on_start_training)			
 
 	return callback
 
@@ -80,11 +81,11 @@ def on_load_level(level_name):
 
 
 
-def on_settings(btn):
+def on_settings(btn=None):
 	global scene
 	scene = "settings"
 
-def back_to_menu(btn):
+def back_to_menu(btn=None):
 	global scene
 	scene = "main-menu"
 
@@ -95,11 +96,6 @@ def on_settings(btn):
 def on_quit(btn):
 	global running
 	running = False
-
-def back_to_menu(btn):
-	global scene
-	scene = "main-menu"
-
 
 # setup callbacks
 
@@ -157,7 +153,7 @@ while running:
 			if event.button == 1:
 				scenes[scene].click(event.pos)
 		elif event.type == pygame.KEYDOWN:
-			if input_text:
+			if "level" in scene :
 				input_text.update_text(key_handler.translate_event(event))
 			# forward key events to the input handler for pressed-state tracking
 			try:

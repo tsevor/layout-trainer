@@ -269,11 +269,12 @@ class Text_box(Element):
 	def __init__(self, id, data):
 		super().__init__(id, data)
 		import importlib
-		import word_generator
 		self.text = data["text"]
 		self.font_name = data.get("font", "Arial")
 		self.font_size = data.get("size", 12)
 		self.layout_name = data.get("layout_name", "qwerty")
+		self.rounds = 3
+		self.level_over_callback = None
 		
 		self.font_key = f"{self.font_name}_{self.font_size}"
 		if self.font_key not in fonts:
@@ -281,15 +282,23 @@ class Text_box(Element):
 		self.font = fonts[self.font_key]
 		self.color = parse_color(data.get("color", (255, 255, 255)))
 		self.pos = data.get("pos", [0, 0])
+
+		self.current_rows = []
 	
 	def change_text(self, new_text):
 		self.text = new_text
 		self.render()
 	
-	def update_text(self, key):
+	def update_text(self, key): 
 		if key == self.text[0]: 
 			self.change_text(self.text[1:])
-
+		if self.text == '':
+			if self.rounds == 0 and self.level_over_callback: 
+				self.level_over_callback()
+				return
+			self.generate_words(self.layout_name, self.current_rows)
+			self.rounds -= 1
+				
 	#load layout
 	def _load_layout(self, importlib_module):
 		try:
@@ -310,6 +319,23 @@ class Text_box(Element):
 
 	def draw(self, surface):
 		surface.blit(self.rendered_text, self.bounds)
+
+	def generate_words(self, layout, rows):
+		import word_generator
+		words_object = word_generator.Wordlist(layout,rows)
+		sentence = ""
+		for word in words_object.random(10):
+			sentence += word + " "
+		
+		sentence = sentence[:len(sentence)-1] # deletes trailing space
+		self.change_text(sentence)
+
+	def start_level(self, rounds, layout, rows, level_over_callback=None):
+		self.rounds = rounds - 1
+		self.layout_name = layout
+		self.current_rows = rows
+		self.level_over_callback = level_over_callback
+		self.generate_words(self.layout_name, self.current_rows)
 
 class Scene:
 	def __init__(self, layout_path):
