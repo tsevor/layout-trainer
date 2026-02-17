@@ -235,6 +235,8 @@ class KeyboardOverlay(Element):
 					row = self.shift_rows[row_idx]
 					if 0 <= col_idx < len(row):
 						label = row[col_idx]
+			
+				
 
 			# detect pressed state via the base (unshifted) character
 			pressed = False
@@ -247,8 +249,13 @@ class KeyboardOverlay(Element):
 						keycode = None
 				if keycode is not None and 0 <= keycode < len(self.key_handler.keycodes):
 					pressed = bool(self.key_handler.keycodes[keycode])
-
+			#------------------------------------------------------------------------------- set color ----------------
+			
 			color = (200, 100, 60) if (pressed or base_ch.lower() in self.highlight) else (80, 80, 120)
+			if (row_idx == 1 and (col_idx == 3 or col_idx == 6) and not (pressed or base_ch.lower() in self.highlight)):
+				color =  (103, 103, 163)
+
+
 			pygame.draw.rect(surface, color, rect, border_radius=6)
 			pygame.draw.rect(surface, (120, 120, 160), rect, 2, border_radius=6)
 			# render label fresh so shifted labels show when Shift is pressed
