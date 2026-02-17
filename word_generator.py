@@ -6,6 +6,9 @@ chosen = 0
 
 chars = {}
 
+file = "wordlists/top10k.txt"
+# file  = "https://raw.githubusercontent.com/The-phoenixR/minecraft-profanity/refs/heads/main/profanity_filter.txt"
+
 def commonality(s): # Checks how common the letters in a word is for the list
     global chars
     score = 0
@@ -31,22 +34,33 @@ class Wordlist: # I don't know if we need a class here, but we do now
         for row in self.rows:
             self.included += layouts[self.layout][row]
         
-        with open("wordlists/top10k.txt") as words:
-            for word in words.read().split('\n'):
-                correct = True
-                for letter in word.lower():
-                    if letter not in chars:
-                        chars[letter] = 1
+        words = ''
+        words_file = None
+        if "https" in file:
+            import requests
+            req = requests.get(file)
+            words = req.text
+        else:
+            words_file = open(file)
+            words = words_file.read()
+        
+        for word in words.split('\n'):
+            correct = True
+            for letter in word.lower():
+                if letter not in chars:
+                    chars[letter] = 1
 
-                    else:
-                        chars[letter] += 1
-                    
-                    if not letter in self.included:
-                        correct = False
+                else:
+                    chars[letter] += 1
                 
-                if correct and len(word) >= self.min_length:
-                    self.all_words.append(word)
+                if not letter in self.included:
+                    correct = False
+            
+            if correct and len(word) >= self.min_length:
+                self.all_words.append(word)
 
+        if not "http" in file:
+            words.close()
         # self.all_words.sort(key=commonality) sorts words based on how common the letters in the word are, but it is not needed for our purposes and it is slow, so I commented it out
 
     def random(self,amount=10): # Generates a list of random words, amount being the amount

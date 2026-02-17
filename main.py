@@ -33,13 +33,6 @@ scenes = {
 	"level_2": ui.Scene("ui/levels/level_2.json"),
 }
 
-level_difficulty = [
-	[1],
-	[0,1],
-	[0,2],
-	[0,1,2]
-]
-
 key_handler = inputHandling.keyCodeHandler({"layout": "qwerty"})
 scene = "main-menu"
 current_layout = "qwerty"
