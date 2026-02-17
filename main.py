@@ -31,6 +31,7 @@ scenes = {
 	"settings": ui.Scene("ui/settings.json"),
 	"levels": ui.Scene("ui/levels.json"),
 	"level_1": ui.Scene("ui/levels/level_1.json"),
+	"level_2": ui.Scene("ui/levels/level_2.json"),
 }
 
 key_handler = inputHandling.keyCodeHandler({"layout": "qwerty"})
@@ -136,6 +137,7 @@ scenes["main-menu"].on_click("start_button", on_start_training)
 scenes["main-menu"].on_click("quit_button", on_quit)
 
 scenes["levels"].on_click("level_1_btn", on_load_level("level_1"))
+scenes["levels"].on_click("level_2_btn", on_load_level("level_2"))
 scenes["levels"].on_click("exit_button", back_to_menu)
 
 
@@ -143,6 +145,7 @@ scenes["levels"].on_click("exit_button", back_to_menu)
 scenes["training"].on_click("back_button", back_to_menu)
 
 scenes["level_1"].on_click("back_button", back_to_menu)
+scenes["level_2"].on_click("back_button", back_to_menu)
 
 
 running = True

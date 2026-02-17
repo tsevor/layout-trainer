@@ -31,7 +31,8 @@
 		"key_width": 46,
 		"key_height": 46,
 		"spacing": 6,
-		"font_size": 18
+		"font_size": 18,
+		"rows_shown": [1]
 	},
 	"back_button": {
 		"type": "button",
