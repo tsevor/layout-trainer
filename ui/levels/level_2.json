@@ -22,7 +22,9 @@
 		"font": "Arial",
 		"size": 28,
 		"color": [255, 255, 255],
-		"pos": [20, 110]
+		"pos": [20, 110],
+		"rounds": 3,
+		"difficulty": [1]
 	},
 	"keyboard": {
 		"type": "keyboard_overlay",

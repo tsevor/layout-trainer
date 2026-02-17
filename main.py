@@ -72,10 +72,10 @@ def on_load_level(level_name):
 					pass
 		
 		if level_name == "level_1":
-			input_text.start_level(3,current_layout,level_difficulty[0],on_start_training)
+			input_text.start_level(current_layout,on_start_training)
 		if level_name == "level_2":
-			input_text.start_level(3,current_layout,level_difficulty[1],on_start_training)
-			
+			input_text.start_level(current_layout,on_start_training)
+
 	return callback
 
 	
