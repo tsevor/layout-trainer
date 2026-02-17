@@ -273,7 +273,7 @@ class Text_box(Element):
 		self.font_name = data.get("font", "Arial")
 		self.font_size = data.get("size", 12)
 		self.layout_name = data.get("layout_name", "qwerty")
-		self.rounds = 3
+		self.rounds = data.get("rounds", 3) - 1 
 		self.level_over_callback = None
 		
 		self.font_key = f"{self.font_name}_{self.font_size}"
@@ -283,7 +283,7 @@ class Text_box(Element):
 		self.color = parse_color(data.get("color", (255, 255, 255)))
 		self.pos = data.get("pos", [0, 0])
 
-		self.current_rows = []
+		self.current_rows = data.get("difficulty")
 	
 	def change_text(self, new_text):
 		self.text = new_text
@@ -330,10 +330,8 @@ class Text_box(Element):
 		sentence = sentence[:len(sentence)-1] # deletes trailing space
 		self.change_text(sentence)
 
-	def start_level(self, rounds, layout, rows, level_over_callback=None):
-		self.rounds = rounds - 1
+	def start_level(self, layout, level_over_callback=None):
 		self.layout_name = layout
-		self.current_rows = rows
 		self.level_over_callback = level_over_callback
 		self.generate_words(self.layout_name, self.current_rows)
 
