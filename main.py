@@ -13,6 +13,7 @@ The program depends on `pygame` and the local `ui` module.
 import pygame
 import ui
 import inputHandling
+from pathlib import Path
 
 pygame.init()
 pygame.font.init()
@@ -29,13 +30,40 @@ scenes = {
 	"training": ui.Scene("ui/training.json"),
 	"settings": ui.Scene("ui/settings.json"),
 	"levels": ui.Scene("ui/levels.json"),
-	"level_1": ui.Scene("ui/levels/level_1.json"),
-	"level_2": ui.Scene("ui/levels/level_2.json"),
+#	"level_1": ui.Scene("ui/levels/level_1.json"),
+#	"level_2": ui.Scene("ui/levels/level_2.json"),
 }
+
+levels_path = Path('ui/levels')
+levels = []
+for file in levels_path.iterdir():
+	clean = file.name.split('.')[0]
+	levels.append(clean)
+	scenes[clean] = ui.Scene(f"ui/levels/{file.name}")
 
 key_handler = inputHandling.keyCodeHandler({"layout": "qwerty"})
 scene = "main-menu"
 current_layout = "qwerty"
+
+current_level_button_y = 120
+
+def create_level_data(level_name):
+	global current_level_button_y
+
+	split = level_name.split('_')
+	text = f"{split[0]} {split[1]}"
+	current_level_button_y += 60
+	return {
+		"type": "button",
+		"text": text,
+		"font": "Arial", "size": 20,
+		"color": [255, 255, 255],
+		"bg_color": [180, 120, 70],
+		"border_color": [52, 53, 61],
+		"border_radius": 12,
+		"pos": [400, current_level_button_y-60],
+		"centered": True
+	}
 
 def on_start_training(btn=None):
 	global scene
@@ -121,17 +149,25 @@ scenes["main-menu"].on_click("settings_button", on_settings)
 scenes["main-menu"].on_click("start_button", on_start_training)
 scenes["main-menu"].on_click("quit_button", on_quit)
 
-scenes["levels"].on_click("level_1_btn", on_load_level("level_1"))
-scenes["levels"].on_click("level_2_btn", on_load_level("level_2"))
+#scenes["levels"].on_click("level_1_btn", on_load_level("level_1")) # All these commented lines in this section is replaced by the below for loop
+#scenes["levels"].on_click("level_2_btn", on_load_level("level_2"))
 scenes["levels"].on_click("exit_button", back_to_menu)
 
 
 # training scene callbacks
 scenes["training"].on_click("back_button", back_to_menu)
 
-scenes["level_1"].on_click("back_button", back_to_menu)
-scenes["level_2"].on_click("back_button", back_to_menu)
+#scenes["level_1"].on_click("back_button", back_to_menu)
+#scenes["level_2"].on_click("back_button", back_to_menu)
 
+for level in levels:
+	scenes["levels"].elements.append(ui.Button(f"{level}_btn", create_level_data(level)))
+	scenes["levels"].on_click(f"{level}_btn", on_load_level(f"{level}"))
+	scenes[level].on_click("back_button", back_to_menu)
+
+level_exit = scenes["levels"].get_element("exit_button")
+level_exit.pos[1] = current_level_button_y
+level_exit.render()
 
 running = True
 while running:
