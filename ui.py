@@ -31,6 +31,39 @@ pygame.font.init()
 
 fonts = {}
 
+# base resolution used by layouts (matches main.py initial WIDTH/HEIGHT)
+BASE_WIDTH = 800
+BASE_HEIGHT = 600
+SCALE_X = 1.0
+SCALE_Y = 1.0
+SCALE_MIN = 1.0
+# bump this counter whenever draw size changes; each Scene keeps
+# a last-seen version so all scenes re-render when version differs.
+SCALE_VERSION = 0
+
+def set_base_resolution(w, h):
+	global BASE_WIDTH, BASE_HEIGHT
+	BASE_WIDTH = w
+	BASE_HEIGHT = h
+
+def set_draw_size(w, h):
+	"""Set the current drawing surface size and mark scale dirty so
+	Scenes re-render elements with the new scaled sizes/positions.
+	"""
+	global SCALE_X, SCALE_Y, SCALE_MIN, _scale_dirty
+	try:
+		SCALE_X = float(w) / float(BASE_WIDTH)
+		SCALE_Y = float(h) / float(BASE_HEIGHT)
+	except Exception:
+		SCALE_X = SCALE_Y = 1.0
+	SCALE_MIN = min(max(SCALE_X, 0.01), max(SCALE_Y, 0.01))
+	# bump global version so all scenes know to re-render
+	global SCALE_VERSION
+	SCALE_VERSION += 1
+
+def _current_scale_version():
+	return SCALE_VERSION
+
 def parse_color(color):
 	if isinstance(color, str):
 		color = color.lstrip('#')
@@ -43,6 +76,7 @@ class Element:
 		self.data = data
 		self.bounds = None
 		self.click_callback = None
+		self.orig_pos = data.get("pos", [0, 0])
 
 	def click_at(self, pos):
 		if self.bounds and self.bounds.collidepoint(pos):
@@ -56,14 +90,11 @@ class Text(Element):
 		super().__init__(id, data)
 		self.text = data["text"]
 		self.font_name = data.get("font", "Arial")
-		self.font_size = data.get("size", 12)
-		self.font_key = f"{self.font_name}_{self.font_size}"
-		if self.font_key not in fonts:
-			fonts[self.font_key] = pygame.font.SysFont(self.font_name, self.font_size)
-		self.font = fonts[self.font_key]
+		self.orig_font_size = data.get("size", 12)
+		self.font_key = f"{self.font_name}_{self.orig_font_size}"
 		self.color = parse_color(data.get("color", (255, 255, 255)))
-		self.pos = data.get("pos", [0, 0])
-		
+		self.pos = self.orig_pos
+		self.font = None
 		self.render()
 	
 	def change_text(self, new_text):
@@ -71,8 +102,15 @@ class Text(Element):
 		self.render()
 	
 	def render(self):
+		# compute scaled font size and position
+		size = max(8, int(self.orig_font_size * SCALE_MIN))
+		font_key = f"{self.font_name}_{size}"
+		if font_key not in fonts:
+			fonts[font_key] = pygame.font.SysFont(self.font_name, size)
+		self.font = fonts[font_key]
 		self.rendered_text = self.font.render(self.text, True, self.color)
-		self.bounds = self.rendered_text.get_rect(topleft=self.pos)
+		pos = (int(self.orig_pos[0] * SCALE_X), int(self.orig_pos[1] * SCALE_Y))
+		self.bounds = self.rendered_text.get_rect(topleft=pos)
 
 	def draw(self, surface):
 		surface.blit(self.rendered_text, self.bounds)
@@ -82,22 +120,18 @@ class Button(Element):
 		super().__init__(id, data)
 		self.text = data["text"]
 		self.font_name = data.get("font", "Arial")
-		self.font_size = data.get("size", 12)
-		self.font_key = f"{self.font_name}_{self.font_size}"
-		if self.font_key not in fonts:
-			fonts[self.font_key] = pygame.font.SysFont(self.font_name, self.font_size)
-		self.font = fonts[self.font_key]
+		self.orig_font_size = data.get("size", 12)
+		self.font = None
 		self.color = parse_color(data.get("color", (255, 255, 255)))
 		self.bg_color = parse_color(data.get("bg_color", (100, 100, 100)))
 		self.border_color = parse_color(data.get("border_color", (150, 150, 150)))
 		self.border_width = data.get("border_width", 1)
 		self.border_radius = data.get("border_radius", 8)
 		self.centered = data.get("centered", False)
-		self.pos = data.get("pos", [0, 0])
-		
-		self.padding = data.get("padding", 10)
-		
-		
+		self.pos = self.orig_pos
+		self.orig_padding = data.get("padding", 10)
+		self.orig_border_radius = self.border_radius
+		self.orig_border_width = self.border_width
 		self.render()
 	
 	def change_text(self, new_text):
@@ -105,18 +139,27 @@ class Button(Element):
 		self.render()
 	
 	def render(self):
+		# compute scaled font size, padding and border
+		size = max(8, int(self.orig_font_size * SCALE_MIN))
+		font_key = f"{self.font_name}_{size}"
+		if font_key not in fonts:
+			fonts[font_key] = pygame.font.SysFont(self.font_name, size)
+		self.font = fonts[font_key]
 		text_surface = self.font.render(self.text, True, self.color)
-		w = text_surface.get_width() + self.padding * 2
-		h = text_surface.get_height() + self.padding * 2
+		padding = int(self.orig_padding * SCALE_MIN)
+		w = text_surface.get_width() + padding * 2
+		h = text_surface.get_height() + padding * 2
+		px = int(self.orig_pos[0] * SCALE_X)
+		py = int(self.orig_pos[1] * SCALE_Y)
 		if self.centered:
-			self.bounds = pygame.Rect(self.pos[0] - w/2, self.pos[1] - h/2, w, h)
+			self.bounds = pygame.Rect(px - w // 2, py - h // 2, w, h)
 		else:
-			self.bounds = pygame.Rect(self.pos[0], self.pos[1], w, h)
+			self.bounds = pygame.Rect(px, py, w, h)
 		self.text_surface = text_surface
 		if self.centered:
-			self.text_pos = (self.pos[0] - w/2 + self.padding, self.pos[1] - h/2 + self.padding)
+			self.text_pos = (px - w // 2 + padding, py - h // 2 + padding)
 		else:
-			self.text_pos = (self.pos[0] + self.padding, self.pos[1] + self.padding)
+			self.text_pos = (px + padding, py + padding)
 	
 	def draw(self, surface):
 		pygame.draw.rect(surface, self.bg_color, self.bounds, border_radius=self.border_radius)
@@ -132,15 +175,12 @@ class KeyboardOverlay(Element):
 		self.rowsShown = data.get("rows_shown", [0, 1, 2])  # default to showing all rows
 		self.hideLabels = False
 		self.layout_name = data.get("layout", "qwerty")
-		self.pos = data.get("pos", [20, 200])
-		self.key_width = data.get("key_width", 48)
-		self.key_height = data.get("key_height", 48)
-		self.spacing = data.get("spacing", 6)
-		self.font_size = data.get("font_size", 18)
-		self.font_key = f"kbd_{self.font_size}"
-		if self.font_key not in fonts:
-			fonts[self.font_key] = pygame.font.SysFont(None, self.font_size)
-		self.font = fonts[self.font_key]
+		self.orig_pos = data.get("pos", [20, 200])
+		self.orig_key_width = data.get("key_width", 48)
+		self.orig_key_height = data.get("key_height", 48)
+		self.orig_spacing = data.get("spacing", 6)
+		self.orig_font_size = data.get("font_size", 18)
+		self.font = None
 		self.highlight = set(data.get("highlight", []))
 		self.key_handler = None
 		self.char_to_keycode = {}
@@ -156,22 +196,30 @@ class KeyboardOverlay(Element):
 		self.rows = rows
 		self._render_keys()
 
+	def render(self):
+		# re-generate key rects using current scale
+		self._render_keys()
+
 	def _render_keys(self):
 		# store keys with their row/col positions so we can lookup shifted
 		# labels at draw time when Shift is held
 		self.keys = []
-		x0, y0 = self.pos
+		x0 = int(self.orig_pos[0] * SCALE_X)
+		y0 = int(self.orig_pos[1] * SCALE_Y)
+		key_w = int(self.orig_key_width * SCALE_MIN)
+		key_h = int(self.orig_key_height * SCALE_MIN)
+		spacing = int(self.orig_spacing * SCALE_MIN)
 		y = y0
 		for row_idx, row in enumerate(self.rows):
-			x = x0 + (row_idx * self.key_width / 2)
+			x = x0 + int(row_idx * (self.orig_key_width * SCALE_MIN) / 2)
 			for col_idx, ch in enumerate(row):
-				rect = pygame.Rect(x, y, self.key_width, self.key_height)
+				rect = pygame.Rect(x, y, key_w, key_h)
 				self.keys.append((ch, rect, row_idx, col_idx))
-				x += self.key_width + self.spacing
-			y += self.key_height + self.spacing
+				x += key_w + spacing
+			y += key_h + spacing
 
 		# render spacebar (store with sentinel row/col)
-		rect = pygame.Rect(x0 + self.key_width * 4, y, self.key_width * 5, self.key_height)
+		rect = pygame.Rect(x0 + int(self.orig_key_width * 4 * SCALE_MIN), y, key_w * 5, key_h)
 		self.keys.append((" ", rect, -1, -1))
 
 	def set_key_handler(self, handler):
@@ -255,10 +303,14 @@ class KeyboardOverlay(Element):
 			if (row_idx == 1 and (col_idx == 3 or col_idx == 6) and not (pressed or base_ch.lower() in self.highlight)):
 				color =  (103, 103, 163)
 
-
-			pygame.draw.rect(surface, color, rect, border_radius=6)
-			pygame.draw.rect(surface, (120, 120, 160), rect, 2, border_radius=6)
+			pygame.draw.rect(surface, color, rect, border_radius=max(1, int(6 * SCALE_MIN)))
+			pygame.draw.rect(surface, (120, 120, 160), rect, max(1, int(2 * SCALE_MIN)), border_radius=max(1, int(6 * SCALE_MIN)))
 			# render label fresh so shifted labels show when Shift is pressed
+			font_size = max(8, int(self.orig_font_size * SCALE_MIN))
+			font_key = f"kbd_{font_size}"
+			if font_key not in fonts:
+				fonts[font_key] = pygame.font.SysFont(None, font_size)
+			self.font = fonts[font_key]
 			surf = self.font.render(label, True, (255, 255, 255))
 			text_pos = surf.get_rect(center=rect.center)
 			surface.blit(surf, text_pos)
@@ -271,17 +323,15 @@ class Text_box(Element):
 		import importlib
 		self.text = data["text"]
 		self.font_name = data.get("font", "Arial")
-		self.font_size = data.get("size", 12)
+		self.orig_font_size = data.get("size", 12)
 		self.layout_name = data.get("layout_name", "qwerty")
 		self.rounds = data.get("rounds", 3) - 1 
 		self.level_over_callback = None
 		
-		self.font_key = f"{self.font_name}_{self.font_size}"
-		if self.font_key not in fonts:
-			fonts[self.font_key] = pygame.font.SysFont(self.font_name, self.font_size)
-		self.font = fonts[self.font_key]
+		# defer font creation until render with scaled size
+		self.font = None
 		self.color = parse_color(data.get("color", (255, 255, 255)))
-		self.pos = data.get("pos", [0, 0])
+		self.pos = self.orig_pos
 
 		self.current_rows = data.get("difficulty")
 	
@@ -314,8 +364,14 @@ class Text_box(Element):
 		self._load_layout(importlib)
 
 	def render(self):
+		size = max(8, int(self.orig_font_size * SCALE_MIN))
+		font_key = f"{self.font_name}_{size}"
+		if font_key not in fonts:
+			fonts[font_key] = pygame.font.SysFont(self.font_name, size)
+		self.font = fonts[font_key]
 		self.rendered_text = self.font.render(self.text, True, self.color)
-		self.bounds = self.rendered_text.get_rect(topleft=self.pos)
+		pos = (int(self.orig_pos[0] * SCALE_X), int(self.orig_pos[1] * SCALE_Y))
+		self.bounds = self.rendered_text.get_rect(topleft=pos)
 
 	def draw(self, surface):
 		surface.blit(self.rendered_text, self.bounds)
@@ -340,6 +396,7 @@ class Scene:
 		with open(layout_path) as f:
 			self.layout = json.load(f)
 		self.elements = []
+		self._last_scale_version = -1
 		for el_id, el_data in self.layout.items():
 			if el_data["type"] == "text":
 				self.elements.append(Text(el_id, el_data))
@@ -351,6 +408,17 @@ class Scene:
 				self.elements.append(Text_box(el_id, el_data))
 	
 	def draw(self, surface):
+		# if global scale version changed since this scene last rendered,
+		# re-render all elements so they pick up new scaled sizes/positions.
+		cur = _current_scale_version()
+		if self._last_scale_version != cur:
+			for el in self.elements:
+				try:
+					el.render()
+				except Exception:
+					pass
+			self._last_scale_version = cur
+
 		for el in self.elements:
 			el.draw(surface)
 	
