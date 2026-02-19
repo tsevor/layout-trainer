@@ -60,6 +60,16 @@
 		"border_radius": 10,
 		"pos": [500, 150]
 	},
+	"fullscreen_button": {
+		"type": "button",
+		"text": "Toggle Fullscreen",
+		"font": "Arial", "size": 18,
+		"color": [255, 255, 255],
+		"bg_color": [80, 80, 120],
+		"border_color": [120, 120, 160],
+		"border_radius": 10,
+		"pos": [20, 200]
+	},
 	"back_button": {
 		"type": "button",
 		"text": "Back",

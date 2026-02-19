@@ -17,7 +17,17 @@ import inputHandling
 pygame.init()
 pygame.font.init()
 
-screen = pygame.display.set_mode((800, 600))
+fullscreen = False
+WIDTH, HEIGHT = 800, 600
+screen = pygame.display.set_mode((WIDTH, HEIGHT), pygame.RESIZABLE)
+windowed_size = (WIDTH, HEIGHT)
+
+# inform ui about the base layout resolution and current draw size
+ui.set_base_resolution(WIDTH, HEIGHT)
+ui.set_draw_size(WIDTH, HEIGHT)
+
+
+
 #make surface for icon.ico
 icon = pygame.image.load("icon.png")
 pygame.display.set_icon(icon)
@@ -86,6 +96,22 @@ def on_quit(btn):
 	global running
 	running = False
 
+def toggle_fullscreen(btn=None):
+	global fullscreen, screen, windowed_size
+	fullscreen = not fullscreen
+	if fullscreen:
+		try:
+			windowed_size = pygame.display.get_window_size()
+		except Exception:
+			windowed_size = (WIDTH, HEIGHT)
+		screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
+		# use the surface size (more reliable) to update UI scale
+		ui.set_draw_size(*screen.get_size())
+	else:
+		w, h = windowed_size
+		screen = pygame.display.set_mode((w, h), pygame.RESIZABLE)
+		ui.set_draw_size(*screen.get_size())
+
 # setup callbacks
 
 def set_layout(layout_name):
@@ -116,6 +142,7 @@ scenes["settings"].on_click("dvorak_button", set_layout("dvorak"))
 scenes["settings"].on_click("colemak_button", set_layout("colemak"))
 scenes["settings"].on_click("workman_button", set_layout("workman"))
 scenes["settings"].on_click("back_button", back_to_menu)
+scenes["settings"].on_click("fullscreen_button", toggle_fullscreen)
 
 scenes["main-menu"].on_click("settings_button", on_settings)
 scenes["main-menu"].on_click("start_button", on_start_training)
@@ -138,6 +165,10 @@ while running:
 	for event in pygame.event.get():
 		if event.type == pygame.QUIT:
 			running = False
+		elif event.type == pygame.VIDEORESIZE:
+			# handle window resize (user dragged window corner)
+			screen = pygame.display.set_mode(event.size, pygame.RESIZABLE)
+			ui.set_draw_size(*event.size)
 		elif event.type == pygame.MOUSEBUTTONDOWN:
 			if event.button == 1:
 				scenes[scene].click(event.pos)
@@ -154,6 +185,20 @@ while running:
 				key_handler.handle_keyup(event)
 			except Exception:
 				pass
+		elif event.type == pygame.KEYDOWN:
+			# Toggle fullscreen with F11
+			if event.key == pygame.K_F11:
+				toggle_fullscreen()
+
+			elif "level" in scene:
+				input_text.update_text(key_handler.translate_event(event))
+
+			# forward key events to the input handler
+			try:
+				key_handler.handle_keydown(event)
+			except Exception:
+				pass
+
 
 	screen.fill((40, 38, 42))
 	scenes[scene].draw(screen)
