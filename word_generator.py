@@ -6,7 +6,7 @@ chosen = 0
 
 chars = {}
 
-file = "wordlists/top10k.txt"
+file = "wordlists/top10kfiltered.txt"
 # file  = "https://raw.githubusercontent.com/The-phoenixR/minecraft-profanity/refs/heads/main/profanity_filter.txt"
 
 def commonality(s): # Checks how common the letters in a word is for the list
