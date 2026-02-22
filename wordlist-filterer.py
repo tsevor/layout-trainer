@@ -436,13 +436,13 @@ while True:
                 else: col = theme["accent"]
 
             txt = font.render(word_str, True, col)
-            txt = pygame.transform.rotate(txt, 45)
+            txt = pygame.transform.rotate(txt, 35)
             rect = txt.get_rect(center=(x_raw + sx, y_raw + sy))
             
             if i == int(round(display_index)):
                 glow = font.render(word_str, True, (col[0], col[1], col[2]))
                 glow.set_alpha(50)
-                glow = pygame.transform.rotate(glow, 45)
+                glow = pygame.transform.rotate(glow, 35)
                 SCREEN.blit(glow, (rect.x - 3, rect.y - 3))
                 SCREEN.blit(glow, (rect.x + 3, rect.y + 3))
             
