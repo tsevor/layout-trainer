@@ -187,6 +187,7 @@ scenes["training"].on_click("back_button", back_to_menu)
 #scenes["level_1"].on_click("back_button", back_to_menu)
 #scenes["level_2"].on_click("back_button", back_to_menu)
 
+levels.sort()
 for level in levels:
 	scenes["levels"].elements.append(ui.Button(f"{level}_btn", create_level_data(level)))
 	scenes["levels"].on_click(f"{level}_btn", on_load_level(f"{level}"))
