@@ -9296,8 +9296,6 @@ witness
 witnesses
 wives
 wizard
-wm
-wn
 wolf
 woman
 women
@@ -9371,7 +9369,6 @@ yang
 yard
 yards
 yarn
-yea
 yeah
 year
 yearly
@@ -9385,8 +9382,6 @@ yesterday
 yet
 yield
 yields
-yn
-yo
 yoga
 york
 yorkshire
@@ -9399,8 +9394,6 @@ yourself
 youth
 yugoslavia
 yukon
-z
-za
 zambia
 zdnet
 zealand
