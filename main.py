@@ -62,7 +62,7 @@ def create_level_data(level_name):
 
 	split = level_name.split('_')
 	text = f"{split[0]} {split[1]}"
-	current_level_button_y += 60
+	current_level_button_y += 50
 	return {
 		"type": "button",
 		"text": text,
@@ -71,7 +71,7 @@ def create_level_data(level_name):
 		"bg_color": [180, 120, 70],
 		"border_color": [52, 53, 61],
 		"border_radius": 12,
-		"pos": [400, current_level_button_y-60],
+		"pos": [400, current_level_button_y-50],
 		"centered": True
 	}
 
