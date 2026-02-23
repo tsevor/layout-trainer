@@ -4046,7 +4046,6 @@ huntington
 hurricane
 hurt
 husband
-hwy
 hybrid
 hydraulic
 hydrocodone
@@ -4077,7 +4076,6 @@ idol
 if
 ignore
 ignored
-il
 ill
 illegal
 illinois
@@ -4085,8 +4083,6 @@ illness
 illustrated
 illustration
 illustrations
-im
-ima
 image
 images
 imagination
