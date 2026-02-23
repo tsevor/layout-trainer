@@ -19,12 +19,12 @@
 		"type": "text_box",
 		"text": "text goes here",
 		"rows_shown": [1],
-		"font": "Arial",
+		"font": "Consolas",
 		"size": 28,
 		"color": [255, 255, 255],
 		"pos": [20, 110],
 		"rounds": 3,
-		"difficulty": [1,2,3]
+		"difficulty": [0,1,2]
 	},
 	"keyboard": {
 		"type": "keyboard_overlay",
