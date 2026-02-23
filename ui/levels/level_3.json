@@ -24,7 +24,7 @@
 		"color": [255, 255, 255],
 		"pos": [20, 110],
 		"rounds": 3,
-		"difficulty": [1]
+		"difficulty": [0,1]
 	},
 	"keyboard": {
 		"type": "keyboard_overlay",
@@ -34,7 +34,7 @@
 		"key_height": 46,
 		"spacing": 6,
 		"font_size": 18,
-		"rows_shown": []
+		"rows_shown": [0,1]
 	},
 	"back_button": {
 		"type": "button",

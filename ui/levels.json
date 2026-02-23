@@ -6,28 +6,6 @@
 		"color": [255, 255, 255],
 		"pos": [200, 20]
 	},
-	"level_1_btn": {
-		"type": "button",
-		"text": "level 1",
-		"font": "Arial", "size": 20,
-		"color": [255, 255, 255],
-		"bg_color": [180, 120, 70],
-		"border_color": [52, 53, 61],
-		"border_radius": 12,
-		"pos": [400, 120],
-		"centered": true
-	},
-	"level_2_btn": {
-		"type": "button",
-		"text": "level 2",
-		"font": "Arial", "size": 20,
-		"color": [255, 255, 255],
-		"bg_color": [180, 120, 70],
-		"border_color": [52, 53, 61],
-		"border_radius": 12,
-		"pos": [400, 180],
-		"centered": true
-	},
 	"exit_button": {
 		"type": "button",
 		"text": "exit",
